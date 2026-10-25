@@ -14,16 +14,19 @@ This is not an Apple project. Everything below was run on an Apple Silicon iMac 
 - [Local API server](#local-api-server)
 - [Limits](#limits)
 - [Troubleshooting](#troubleshooting)
+- [Model card](MODEL_CARD.md)
 
 ## What it is
 
-`fm` is a front end for Apple Foundation Models, the small (about 3 billion parameter) model behind Apple Intelligence. It ships with macOS 27 at `/usr/bin/fm`; there is nothing to install.
+`fm` is a front end for Apple Foundation Models, the on-device model behind Apple Intelligence: AFM 3 Core (3B parameters) or, on more capable Macs, AFM 3 Core Advanced (20B sparse, 1–4B active). Specs are in the [model card](MODEL_CARD.md). It ships with macOS 27 at `/usr/bin/fm`; there is nothing to install.
 
 You need:
 
 - An Apple Silicon Mac on **macOS 27** or later. On macOS 26 the command does not exist.
-- **Apple Intelligence** turned on, with its model downloaded. This is very likely required, since `fm` uses the same model, but it was already on during testing, so it is not confirmed. The download needs internet once; after that `fm` works offline.
+- **Apple Intelligence** turned on, with its model downloaded. Apple's framework has a specific "Apple Intelligence not enabled" state, so this is required. The download needs internet once; after that `fm` works offline.
 - An administrator password, once, to accept Apple's terms.
+
+**Not every Mac gets the same model.** Apple ships two on-device models and says the larger one, AFM 3 Core Advanced, is only for its "most capable Apple silicon systems". Apple has not said which Macs those are. The M4 iMac used for this guide got Core Advanced; an older or smaller Mac may get the 3B AFM 3 Core, which could make answers and speed differ from the results here. To see which one your Mac uses, run [`tools/model-info.swift`](tools/model-info.swift) (instructions in the [model card](MODEL_CARD.md#check-your-own-mac)), and please [share the result](../../issues) with your chip and memory.
 
 It is good at short text jobs: summarizing, extracting fields, classifying, tagging, rewriting, describing an image. It is not a replacement for a large chat model. Expect weak answers on code, maths and anything needing world knowledge.
 
@@ -154,7 +157,7 @@ There is no authentication. Avoid `--host 0.0.0.0` unless you mean to offer the 
 
 ## Limits
 
-**The hard limit is about 8,100 tokens per session**, shared by your instructions, prompt, earlier turns and the answer. Posts quoting 4,096 are out of date for macOS 27. For reliable answers, keep input under about **6,000 tokens** (roughly 4,500 words).
+**The context window is 8,192 tokens per session**, shared by your instructions, prompt, earlier turns and the answer. Posts quoting 4,096 are out of date for macOS 27; the framework reports 8,192, and the hard error appeared at 8,138 in testing because the answer needs room too. For reliable answers, keep input under about **6,000 tokens** (roughly 4,500 words).
 
 How this was measured: one code word at the start and another at the end of filler text, then "List both codes."
 
@@ -185,7 +188,7 @@ Other limits seen in testing:
 | `sudo: a password is required` | Run from a tool with no password prompt | Run it in Terminal.app yourself |
 | `fm available` says the model is unavailable | Apple Intelligence off or still downloading | Turn it on and wait for the download |
 | Piped file ignored; the answer is about your prompt | Piped text plus a typed prompt | Drop the prompt, or pass the file with `--text` |
-| `exceeded the model's context size` | Over ~8,100 tokens, or a long chat | Shorten the input or `/clear`; check with `fm count-tokens` |
+| `exceeded the model's context size` | Over 8,192 tokens, or a long chat | Shorten the input or `/clear`; check with `fm count-tokens` |
 | `No image in transcript` from the OCR tool | No image attached in `fm chat` | Use `fm respond --image` |
 | App gets streaming text instead of JSON | The server streams by default | Send `"stream": false` |
 | `Unknown model '…'` from the server | Wrong model name | Use model `system` |
