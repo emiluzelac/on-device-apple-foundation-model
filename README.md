@@ -11,6 +11,7 @@ This is not an Apple project. Everything below was run on an Apple Silicon iMac 
 - [Everyday use](#everyday-use)
 - [Get JSON back](#get-json-back)
 - [Chat](#chat)
+- [Shell helpers](#shell-helpers)
 - [Local API server](#local-api-server)
 - [Limits](#limits)
 - [Troubleshooting](#troubleshooting)
@@ -129,6 +130,27 @@ Sessions are saved in `~/.fm/sessions/` and named from the conversation; the nam
 - `fm chat -i "You are a careful editor"` starts with instructions.
 
 The OCR and barcode tools read an image that is part of the conversation. Typing a file path is not enough: the OCR tool answered `No image in transcript`. How to attach an image inside `fm chat` was not found in testing, so for images use `fm respond --image`.
+
+## Shell helpers
+
+[`shell/fm-helpers.zsh`](shell/fm-helpers.zsh) adds six short commands for everyday jobs. To install, add one line to `~/.zshrc`, pointing at wherever you saved the file, then open a new Terminal window:
+
+```sh
+source ~/on-device-apple-foundation-model/shell/fm-helpers.zsh
+```
+
+| Command | Does | Tested result |
+| --- | --- | --- |
+| `ask "question"` | Asks anything; with no question it opens `fm chat` | `ask "Capital of France? One word."` → `Paris` |
+| `… \| ask "question"` | Asks about piped text | `cat notes.txt \| ask "Who owns the reading list?"` → `Alex owns the reading list.` |
+| `brief notes.txt` | Three-bullet summary of files or piped text | Three correct bullets from `notes.txt` |
+| `clipbrief` | Three-bullet summary of whatever you copied | Same, from the clipboard |
+| `polish` | Rewrites the clipboard clearly and copies the result back | "hey so the meeting thing is moved to thurs now ok…" → "Hey, the meeting is now on Thursday—Alex has the list, so don't forget!" |
+| `polish "formal"` | Same, in the style you name; also works on piped text | |
+| `tags notes.txt` | Comma-separated topic tags | `book club, meeting schedule, reading list, budget, review date` |
+| `some-command 2>&1 \| explain` | Explains an error and suggests a fix | `ls /nope 2>&1 \| explain` → says the directory doesn't exist, check the spelling |
+
+They handle the traps in this guide for you: piped text goes in with `--text`, so your question is never ignored, and input over 6,000 tokens is refused with a message instead of a confusing error. Change that limit with `FM_MAX_INPUT_TOKENS`.
 
 ## Local API server
 
