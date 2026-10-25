@@ -1,0 +1,27 @@
+{
+  "x-order" : [
+    "owner",
+    "day",
+    "budget"
+  ],
+  "required" : [
+    "owner",
+    "day",
+    "budget"
+  ],
+  "additionalProperties" : false,
+  "properties" : {
+    "day" : {
+      "type" : "string"
+    },
+    "owner" : {
+      "type" : "string",
+      "description" : "who owns it"
+    },
+    "budget" : {
+      "type" : "integer"
+    }
+  },
+  "type" : "object",
+  "title" : "Task"
+}
