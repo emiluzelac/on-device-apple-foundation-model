@@ -17,6 +17,7 @@ func caps(_ c: LanguageModelCapabilities) -> String {
 let m = SystemLanguageModel.default
 print("== SystemLanguageModel.default")
 print("availability:", m.availability)
+// The framework derives variant from contextSize alone (8192 → Core Advanced), not from the model files.
 print("variant:", m.variant)
 print("contextSize:", m.contextSize)
 print("capabilities:", caps(m.capabilities))
